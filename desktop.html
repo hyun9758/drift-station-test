@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>표류 정거장 · 데스크톱</title>
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #0f1420; }
+    iframe { display: block; width: 1440px; border: 0; transform-origin: top left; }
+  </style>
+</head>
+<body>
+  <iframe title="표류 정거장 데스크톱 화면"></iframe>
+  <script>
+    // Preview at a stable desktop width even inside a narrow development panel.
+    // Same origin keeps the existing station and browser save data.
+    const game = document.querySelector('iframe');
+    const target = new URL('./', location.href);
+    target.search = location.search;
+    game.src = target.href;
+    window.addEventListener('message', e => {
+      if (e.source !== game.contentWindow || e.origin !== location.origin || e.data?.type !== 'drift-navigation' || typeof e.data.search !== 'string' || e.data.search.length > 2048) return;
+      const u = new URL(location.href); u.search = e.data.search;
+      history.replaceState(null, '', u);
+    });
+    const fit = () => {
+      const scale = Math.min(1, document.documentElement.clientWidth / 1440);
+      game.style.height = `${Math.ceil(document.documentElement.clientHeight / scale)}px`;
+      game.style.transform = `scale(${scale})`;
+    };
+    new ResizeObserver(fit).observe(document.documentElement);
+    fit();
+  </script>
+</body>
+</html>
